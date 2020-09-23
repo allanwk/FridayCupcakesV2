@@ -3,6 +3,7 @@ import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+import pandas as pd
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly', 'https://www.googleapis.com/auth/spreadsheets']
@@ -32,15 +33,31 @@ def main():
     drive_service = build('drive', 'v3', credentials=creds)
     sheets_service = build('sheets', 'v4', credentials=creds)
 
-    #Call the sheets API
+    #Call the sheets API for orders and stock
     sheet = sheets_service.spreadsheets()
-    result = sheet.values().get(
+    orders_result = sheet.values().get(
         spreadsheetId=ORDERS_SHEET_ID,
-        range='B1:G24',
+        range='A2:G24',
         majorDimension='COLUMNS').execute()
-    orders = result.get('values', [])
-    print(orders)
-    
+    orders = orders_result.get('values', [])
+
+    stock_result = sheet.values().get(
+        spreadsheetId=ORDERS_SHEET_ID,
+        range='K2:L23',
+        majorDimension='COLUMNS').execute()
+    stock = stock_result.get('values', [])
+
+    #Converting data obtained to dataframes
+    orders_df = pd.DataFrame()
+    labels = ['Cliente', 'Maracujá', 'Limão', 'Churros', 'Brigadeiro', 'PedirEndereço']
+    for i in range(len(labels)):
+        orders_df[labels[i]] = pd.Series(orders[i])
+    orders_df = orders_df.fillna(0)
+
+    stock_df = pd.DataFrame()
+    stock_df['Ingrediente'] = pd.Series(stock[0], dtype=str)
+    stock_df['Qty'] = pd.Series(stock[1], dtype=int)
+    stock_df = stock_df.fillna(0)
 
 if __name__ == '__main__':
     main()
