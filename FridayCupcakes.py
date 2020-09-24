@@ -28,7 +28,7 @@ def create_drive_file(name, path, parent_id, drive_service):
         body=metadata,
         media_body=media,
         fields='id').execute()
-    print(file)
+    return file
 
 def main():
     creds = None
@@ -87,18 +87,30 @@ def main():
     generate_helper(orders_df, stock_df)
 
     #Chamando a Drive API para atualizar as informações
-    needed_files = ['helper.txt', 'orders.txt', 'financial_log.txt']
-    for path in needed_files:
+    needed_files = {
+        'helper.txt': '', 
+        'orders.txt': ''
+        }
+
+    for path in needed_files.keys():
         response = drive_service.files().list(
                                             q="name='{}'".format(path),
                                             spaces='drive',
-                                            fields='files(id, name)').execute()
+                                            fields='files(id)').execute()
         if len(response['files']) == 0:
             print("Criando o arquivo {} no drive.".format(path))
-            create_drive_file(path, "./" + path, '12CI1in324iy_Q8sA51nMRp4mTGmgQwtK', drive_service)
-
+            response = create_drive_file(path, "./" + path, '12CI1in324iy_Q8sA51nMRp4mTGmgQwtK', drive_service)
+            needed_files[path] = response['id']
         else:
-            pass
-    
+            needed_files[path] = response['files'][0]['id']
+
+        media = MediaFileUpload("./" + path)
+        file = drive_service.files().update(
+                                        media_body=media,
+                                        fileId=needed_files[path],
+                                        fields='id').execute()
+
+        print("Informações salvas no drive com sucesso.")
+
 if __name__ == '__main__':
     main()
