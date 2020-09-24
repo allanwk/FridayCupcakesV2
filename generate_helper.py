@@ -28,6 +28,7 @@ recipes = {
 def generate_helper(orders_df, stock_df):
     """Gera o arquivo helper.txt, contendo a lista de compras
     e informações sobre as fornadas necessárias.
+    Requer dois DataFrames, um de estoque e outro de pedidos
     """
 
     #Calculando ingredientes utilizados

@@ -4,6 +4,7 @@ import datetime
 def generate_bills(df):
     """Generates a text file containing the order confirmations (bills) of each costumer,
     and also calculates finnancial metrics, returning those in the form a dictonary.
+    For this it requires a DataFrame with the orders.
     """
 
     total = 0
