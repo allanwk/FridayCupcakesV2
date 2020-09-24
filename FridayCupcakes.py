@@ -7,11 +7,18 @@ import pandas as pd
 import datetime
 from generate_bills import generate_bills
 from math import ceil
+import warnings
 
-# If modifying these scopes, delete the file token.pickle.
+#Requisitando que o script ignore o FutureWarning do numpy
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+# Definição de escopos necessários do Google Cloud
+# Se forem modificados deletar o arquivo PICKLE
 SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly', 'https://www.googleapis.com/auth/spreadsheets']
 ORDERS_SHEET_ID = '1tDdoexzEMvBmHiFFPs9nl_UO92kfa7amWEgoyeeLWCI'
 
+#Informações sobre as receitas para calcular os ingredientes usados.
+#A maioria dos valores está em gramas.
 recipes = {
     'Maracujá': {
         'farinha': 14.595, 'açúcar': 17.764, 'óleo':11.008, 'ovos': 14.595, 'fermento': 0.625, 'forminha': 1,
@@ -35,13 +42,9 @@ recipes = {
 
 def main():
     creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -49,14 +52,13 @@ def main():
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
     drive_service = build('drive', 'v3', credentials=creds)
     sheets_service = build('sheets', 'v4', credentials=creds)
 
-    #Call the sheets API for orders and stock
+    #Chamar a Sheets API para pegar as informações de pedidos e estoque
     sheet = sheets_service.spreadsheets()
     orders_result = sheet.values().get(
         spreadsheetId=ORDERS_SHEET_ID,
@@ -89,7 +91,7 @@ def main():
     stock_df = stock_df.fillna(0)
 
     #Analisando pedidos / geração de métricas
-    print(generate_bills(orders_df))
+    metrcis = generate_bills(orders_df)
 
     #Calculando ingredientes utilizados
     qtys = {
@@ -103,8 +105,8 @@ def main():
             stock_df.at[ingredient, "Needed"] = round(qty * quantity, 2)
 
     #Gerando lista de compras
-    shopping_list = open("shopping_list.txt", "w+", encoding="UTF-8")
-    shopping_list.write(("▬▬▬▬▬▬▬▬▬▬▬▬▬" + str(datetime.date.today()) + "▬▬▬▬▬▬▬▬▬▬▬▬▬\n"))
+    helper = open("helper.txt", "w+", encoding="UTF-8")
+    helper.write(("▬▬▬▬▬▬▬▬▬▬▬▬▬" + str(datetime.date.today()) + "▬▬▬▬▬▬▬▬▬▬▬▬▬\n"))
     for index, row in stock_df.iterrows():
 
         #Quando a quantidade por embalagem é 0, significa que é um ingrediente medido
@@ -119,11 +121,23 @@ def main():
         elif (row["Needed"] >= row["Qty"] or row["Qty"] <= 11):
             buy_qty = ceil((row["Needed"] - row["Qty"]) / row["Qty per Package"])
         if buy_qty != 0:
-            shopping_list.write("{} x{}\n".format(index, buy_qty))
+            helper.write("{} x{}\n".format(index, buy_qty))
     
-    shopping_list.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
-    shopping_list.close()
-    print("Lista de compras gerada com sucesso.")
+    helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
+
+    #Informações adicionais sobre as fornadas necessárias
+    regular_batter = int(qtys["Maracujá"] + qtys["Limão"] + qtys["Brigadeiro"])
+    cinnamon_batter = int(qtys["Churros"])
+    regular_batches = ceil(regular_batter / 12)
+    cinnamon_batches = ceil(cinnamon_batter / 12)
+    time = datetime.time(minute=((regular_batches+cinnamon_batches)*27))
+
+    helper.write("Massas comuns: {}\nMassas com canela: {}\n".format(regular_batter, cinnamon_batter))
+    helper.write("Fornadas comuns: {}\nFornadas com canela: {}\n".format(regular_batches, cinnamon_batches))
+    helper.write("Tempo estimado (melhor caso): {}\n".format(str(time)))
+    helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
+    helper.close()
+    print("Arquivo informativo criado com sucesso.")
 
 if __name__ == '__main__':
     main()

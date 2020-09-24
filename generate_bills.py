@@ -47,6 +47,7 @@ def generate_bills(df):
             order_confirmations.write("Além disso, em que endereço você deseja que entreguemos?\n")
 
         order_confirmations.close()
+        print("Mensagens de confirmação geradas com sucesso")
 
         profit = total - cost
         return {
