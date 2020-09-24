@@ -51,14 +51,14 @@ def generate_bills(df):
         if row["PedirEndereço"] == "S":
             order_confirmations.write("Além disso, em que endereço você deseja que entreguemos?\n")
 
-        order_confirmations.close()
-        print("Mensagens de confirmação geradas com sucesso")
+    order_confirmations.close()
+    print("Mensagens de confirmação geradas com sucesso")
 
-        profit = total - cost
-        return {
-            'Cost': round(cost, 2), 
-            'Income': round(total, 2),
-            'Profit': round(profit, 2),
-            'CupcakesSold': numCupcakes,
-            'ProfitPerCupcake': round(profit/numCupcakes, 2)
-        }
+    profit = total - cost
+    return {
+        'Cost': round(cost, 2), 
+        'Income': round(total, 2),
+        'Profit': round(profit, 2),
+        'CupcakesSold': numCupcakes,
+        'ProfitPerCupcake': round(profit/numCupcakes, 2)
+    }

@@ -45,6 +45,7 @@ def main():
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
+    print("Acessando informações do drive.")
     drive_service = build('drive', 'v3', credentials=creds)
     sheets_service = build('sheets', 'v4', credentials=creds)
 
@@ -84,7 +85,7 @@ def main():
     metrics = generate_bills(orders_df)
 
     #Gerando o arquivo helper.txt
-    generate_helper(orders_df, stock_df)
+    generate_helper(orders_df, stock_df, metrics)
 
     #Chamando a Drive API para atualizar as informações
     needed_files = {
@@ -110,7 +111,7 @@ def main():
                                         fileId=needed_files[path],
                                         fields='id').execute()
 
-        print("Informações salvas no drive com sucesso.")
+    print("Informações salvas no drive com sucesso.")
 
 if __name__ == '__main__':
     main()

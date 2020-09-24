@@ -25,7 +25,7 @@ recipes = {
         }
 }
 
-def generate_helper(orders_df, stock_df):
+def generate_helper(orders_df, stock_df, metrics):
     """Gera o arquivo helper.txt, contendo a lista de compras
     e informações sobre as fornadas necessárias.
     Requer dois DataFrames, um de estoque e outro de pedidos
@@ -74,5 +74,11 @@ def generate_helper(orders_df, stock_df):
     helper.write("Fornadas comuns: {}\nFornadas com canela: {}\n".format(regular_batches, cinnamon_batches))
     helper.write("Tempo estimado (melhor caso): {}\n".format(str(time)))
     helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
+
+    helper.write("Gastos: R${:.2f}\n".format(metrics['Cost']))
+    helper.write("Lucro: R${:.2f}\n".format(metrics['Profit']))
+    helper.write("Lucro por cupcake: R${:.2f}\n".format(metrics['ProfitPerCupcake']))
+    helper.write("Cupcakes vendidos: {}\n".format(metrics['CupcakesSold']))
+
     helper.close()
     print("Arquivo informativo criado com sucesso.")
