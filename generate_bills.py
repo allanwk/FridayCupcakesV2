@@ -35,13 +35,17 @@ def generate_bills(df):
         for flavor in flavors:
             cost += row[flavor] * info.at[flavor, "perCupcake"]
             if row[flavor] == 1:
-                order_confirmations.write("1 cupcake de " + flavor + " - R$2.50\n")
+                #order_confirmations.write("1 cupcake de " + flavor + " - R$2.50\n")
+                order_confirmations.write("1 cupcake de {} - R$2.50\n".format(flavor))
             elif row[flavor] > 1:
-                order_confirmations.write(str(row[flavor]) + " cupcakes de " + flavor + " - R$" + str(round(2.5*row[flavor], 2)) + "\n")
+                #order_confirmations.write(str(row[flavor]) + " cupcakes de " + flavor + " - R$" + str(round(2.5*row[flavor], 2)) + "\n")
+                order_confirmations.write("{:d} cupcakes de {} - R${:.2f}\n".format(row[flavor], flavor, round(2.5*row[flavor], 2)))
         if sum >= 5:
-            order_confirmations.write("\nTotal com desconto aplicado: R$" + str(round(price,2)) + "\n")
+            #order_confirmations.write("\nTotal com desconto aplicado: R$" + str(round(price,2)) + "\n")
+            order_confirmations.write("\nTotal com desconto aplicado: R${:.2f}\n".format(round(price,2)))
         else:
-            order_confirmations.write("\nTotal: R$" + str(round(price,2)) + "\n")
+            #order_confirmations.write("\nTotal: R$" + str(round(price,2)) + "\n")
+            order_confirmations.write("\nTotal: R${:.2f}\n".format(round(price, 2)))
         order_confirmations.write("(apenas em dinheiro ou transferência)\n\nVocê vai estar em casa a partir das 18h00 amanhã para nós entregarmos?\n")
         if row["PedirEndereço"] == "S":
             order_confirmations.write("Além disso, em que endereço você deseja que entreguemos?\n")
