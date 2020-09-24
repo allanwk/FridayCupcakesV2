@@ -1,5 +1,8 @@
 import pandas as pd
 import datetime
+from math import ceil
+
+box_cost = 0.36
 
 def generate_bills(df):
     """Generates a text file containing the order confirmations (bills) of each costumer,
@@ -7,6 +10,7 @@ def generate_bills(df):
     For this it requires a DataFrame with the orders.
     """
 
+    total_boxes = 0
     total = 0
     cost = 0
     numCupcakes = 0
@@ -27,6 +31,9 @@ def generate_bills(df):
             price*=0.95
         elif (sum == 5):
             price = 12.00
+        boxes = ceil(sum/5)
+        total_boxes += boxes
+        cost += boxes*box_cost
         total += price
         numCupcakes += sum
 
@@ -36,16 +43,12 @@ def generate_bills(df):
         for flavor in flavors:
             cost += row[flavor] * info.at[flavor, "perCupcake"]
             if row[flavor] == 1:
-                #order_confirmations.write("1 cupcake de " + flavor + " - R$2.50\n")
                 order_confirmations.write("1 cupcake de {} - R$2.50\n".format(flavor))
             elif row[flavor] > 1:
-                #order_confirmations.write(str(row[flavor]) + " cupcakes de " + flavor + " - R$" + str(round(2.5*row[flavor], 2)) + "\n")
                 order_confirmations.write("{:d} cupcakes de {} - R${:.2f}\n".format(row[flavor], flavor, round(2.5*row[flavor], 2)))
         if sum >= 5:
-            #order_confirmations.write("\nTotal com desconto aplicado: R$" + str(round(price,2)) + "\n")
             order_confirmations.write("\nTotal com desconto aplicado: R${:.2f}\n".format(round(price,2)))
         else:
-            #order_confirmations.write("\nTotal: R$" + str(round(price,2)) + "\n")
             order_confirmations.write("\nTotal: R${:.2f}\n".format(round(price, 2)))
         order_confirmations.write("(apenas em dinheiro ou transferência)\n\nVocê vai estar em casa a partir das 18h00 amanhã para nós entregarmos?\n")
         if row["PedirEndereço"] == "S":
@@ -60,5 +63,6 @@ def generate_bills(df):
         'Income': round(total, 2),
         'Profit': round(profit, 2),
         'CupcakesSold': numCupcakes,
-        'ProfitPerCupcake': round(profit/numCupcakes, 2)
+        'ProfitPerCupcake': round(profit/numCupcakes, 2),
+        'Boxes': total_boxes
     }

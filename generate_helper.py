@@ -50,7 +50,7 @@ def generate_helper(orders_df, stock_df, metrics):
         #Quando a quantidade por embalagem é 0, significa que é um ingrediente medido
         #em unidades (ovos, maraujá ou limão)
 
-        ignore = ["ovos"]
+        ignore = ["ovos", "caixas"]
         buy_qty = 0
         if index in ignore:
             continue
@@ -61,6 +61,14 @@ def generate_helper(orders_df, stock_df, metrics):
         if buy_qty != 0:
             helper.write("{} x{}\n".format(index, buy_qty))
     
+    helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
+
+    #Informações sobre as caixas
+    helper.write("Caixas em estoque: {}\n".format(stock_df.at["caixas", "Qty"]))
+    if stock_df.at["caixas", "Qty"] < metrics["Boxes"]:
+        helper.write("Necessária a produção de {} caixas\n".format(metrics["Boxes"] - stock_df.at["caixas", "Qty"]))
+    else:
+        helper.write("Caixas suficientes no estoque.\n")
     helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
 
     #Informações adicionais sobre as fornadas necessárias
@@ -79,6 +87,8 @@ def generate_helper(orders_df, stock_df, metrics):
     helper.write("Lucro: R${:.2f}\n".format(metrics['Profit']))
     helper.write("Lucro por cupcake: R${:.2f}\n".format(metrics['ProfitPerCupcake']))
     helper.write("Cupcakes vendidos: {}\n".format(metrics['CupcakesSold']))
+
+    helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
 
     helper.close()
     print("Arquivo informativo criado com sucesso.")

@@ -59,7 +59,7 @@ def main():
 
     stock_result = sheet.values().get(
         spreadsheetId=ORDERS_SHEET_ID,
-        range='K2:M21',
+        range='K2:M22',
         majorDimension='COLUMNS').execute()
     stock = stock_result.get('values', [])
 
