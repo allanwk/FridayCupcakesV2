@@ -45,11 +45,12 @@ def generate_helper(orders_df, stock_df, metrics, extra_flavor):
     }
     for flavor, quantity in qtys.items():
         for ingredient, qty in recipes[flavor].items():
-            stock_df.at[ingredient, "Needed"] = round(qty * quantity, 2)
+            stock_df.at[ingredient, "Needed"] += round(qty * quantity, 2)
 
     #Gerando lista de compras
     helper = open("helper.txt", "w+", encoding="UTF-8")
     helper.write(("▬▬▬▬▬▬▬▬▬▬▬▬▬" + str(datetime.date.today()) + "▬▬▬▬▬▬▬▬▬▬▬▬▬\n"))
+    print(stock_df)
     for index, row in stock_df.iterrows():
 
         #Quando a quantidade por embalagem é 0, significa que é um ingrediente medido
@@ -77,7 +78,7 @@ def generate_helper(orders_df, stock_df, metrics, extra_flavor):
     helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
 
     #Informações adicionais sobre as fornadas necessárias
-    regular_batter = int(qtys["Maracujá"] + qtys["Limão"] + qtys["Brigadeiro"])
+    regular_batter = int(qtys["Maracujá"] + qtys["Limão"] + qtys["Brigadeiro"] + qtys[extra_flavor])
     cinnamon_batter = int(qtys["Churros"])
     regular_batches = ceil(regular_batter / 12)
     cinnamon_batches = ceil(cinnamon_batter / 12)
