@@ -22,10 +22,14 @@ recipes = {
         'farinha': 14.595, 'açúcar': 17.764, 'óleo':11.008, 'ovos': 14.595, 'fermento': 0.625, 'forminha': 1,
         'chantilly': 8.333, 'chocolate em pó': 1.25, 'leite condensado': 16.471, 'creme de leite': 8.34,
         'chocolate meio amargo': 2.502, 'chocolate ao leite': 1.668, 'margarina': 0.667
+        },
+    'Amora': {
+        'farinha': 14.595, 'açúcar': 17.764, 'óleo':11.008, 'ovos': 14.595, 'fermento': 0.625, 'forminha': 1,
+        'chantilly': 8.333
         }
 }
 
-def generate_helper(orders_df, stock_df, metrics):
+def generate_helper(orders_df, stock_df, metrics, extra_flavor):
     """Gera o arquivo helper.txt, contendo a lista de compras
     e informações sobre as fornadas necessárias.
     Requer dois DataFrames, um de estoque e outro de pedidos
@@ -33,6 +37,7 @@ def generate_helper(orders_df, stock_df, metrics):
 
     #Calculando ingredientes utilizados
     qtys = {
+        extra_flavor: orders_df[extra_flavor].sum(),
         'Maracujá': orders_df['Maracujá'].sum(),
         'Limão': orders_df['Limão'].sum(),
         'Churros': orders_df['Churros'].sum(),
@@ -50,7 +55,7 @@ def generate_helper(orders_df, stock_df, metrics):
         #Quando a quantidade por embalagem é 0, significa que é um ingrediente medido
         #em unidades (ovos, maraujá ou limão)
 
-        ignore = ["ovos", "caixas"]
+        ignore = ["ovos", "caixas", "amoras"]
         buy_qty = 0
         if index in ignore:
             continue
@@ -76,11 +81,11 @@ def generate_helper(orders_df, stock_df, metrics):
     cinnamon_batter = int(qtys["Churros"])
     regular_batches = ceil(regular_batter / 12)
     cinnamon_batches = ceil(cinnamon_batter / 12)
-    time = datetime.time(minute=((regular_batches+cinnamon_batches)*27))
+    #time = datetime.time(minute=((regular_batches+cinnamon_batches)*27))
 
     helper.write("Massas comuns: {}\nMassas com canela: {}\n".format(regular_batter, cinnamon_batter))
     helper.write("Fornadas comuns: {}\nFornadas com canela: {}\n".format(regular_batches, cinnamon_batches))
-    helper.write("Tempo estimado (melhor caso): {}\n".format(str(time)))
+    #helper.write("Tempo estimado (melhor caso): {}\n".format(str(time)))
     helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
 
     helper.write("Gastos: R${:.2f}\n".format(metrics['Cost']))

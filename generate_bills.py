@@ -4,7 +4,7 @@ from math import ceil
 
 box_cost = 0.36
 
-def generate_bills(df):
+def generate_bills(df, extra_flavor):
     """Generates a text file containing the order confirmations (bills) of each costumer,
     and also calculates finnancial metrics, returning those in the form a dictonary.
     For this it requires a DataFrame with the orders.
@@ -15,9 +15,9 @@ def generate_bills(df):
     cost = 0
     numCupcakes = 0
 
-    flavors = ["Maracujá", "Limão", "Churros", "Brigadeiro"]
-    info = pd.DataFrame({'flavor': ["Maracujá", "Limão", "Churros", "Brigadeiro"],
-                        'perCupcake': [1.24, 0.61, 0.63, 0.83]})
+    flavors = ["Maracujá", "Limão", "Churros", "Brigadeiro", extra_flavor]
+    info = pd.DataFrame({'flavor': ["Maracujá", "Limão", "Churros", "Brigadeiro", extra_flavor],
+                        'perCupcake': [1.24, 0.61, 0.63, 0.83, 1]})
     info = info.set_index('flavor')
 
     order_confirmations = open("orders.txt", "w+", encoding='UTF-8')
@@ -25,7 +25,7 @@ def generate_bills(df):
 
     for index, row in df.iterrows():
         order_confirmations.write("\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
-        sum = int(row["Maracujá"]) + int(row["Limão"]) + int(row["Churros"]) + int(row["Brigadeiro"])
+        sum = int(row["Maracujá"]) + int(row["Limão"]) + int(row["Churros"]) + int(row["Brigadeiro"]) + int(row[extra_flavor])
         price = sum*2.5
         if (sum > 5):
             price*=0.95

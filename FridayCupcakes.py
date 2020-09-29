@@ -57,6 +57,12 @@ def main():
         majorDimension='COLUMNS').execute()
     orders = orders_result.get('values', [])
 
+    extra_flavor_result = sheet.values().get(
+        spreadsheetId=ORDERS_SHEET_ID,
+        range='F1',
+    ).execute()
+    extra_flavor = extra_flavor_result.get('values', [])[0][0]
+
     stock_result = sheet.values().get(
         spreadsheetId=ORDERS_SHEET_ID,
         range='K2:M22',
@@ -64,10 +70,10 @@ def main():
     stock = stock_result.get('values', [])
 
     #Convertendo dados para DataFrames
-    labels = ['Cliente', 'Maracujá', 'Limão', 'Churros', 'Brigadeiro', 'PedirEndereço']
+    labels = ['Cliente', 'Maracujá', 'Limão', 'Churros', 'Brigadeiro', extra_flavor, 'PedirEndereço']
     orders_df = pd.DataFrame(columns=labels)
     for i in range(len(labels)):
-        if i != 0 and i != 5:
+        if i != 0 and i != len(labels) - 1:
             orders_df[labels[i]] = pd.Series(orders[i], dtype=int)
         else:
             orders_df[labels[i]] = pd.Series(orders[i], dtype=str)
@@ -82,10 +88,10 @@ def main():
     stock_df = stock_df.fillna(0)
 
     #Analisando pedidos / geração de métricas
-    metrics = generate_bills(orders_df)
+    metrics = generate_bills(orders_df, extra_flavor)
 
     #Gerando o arquivo helper.txt
-    generate_helper(orders_df, stock_df, metrics)
+    generate_helper(orders_df, stock_df, metrics, extra_flavor)
 
     #Chamando a Drive API para atualizar as informações
     needed_files = {
