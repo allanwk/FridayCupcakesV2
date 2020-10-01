@@ -61,7 +61,8 @@ def generate_helper(orders_df, stock_df, metrics, extra_flavor):
         if index in ignore:
             continue
         if int(row["Qty per Package"]) == 0:
-            buy_qty = ceil((row["Needed"] - row["Qty"]))
+            if row["Needed"] >= row["Qty"]:
+                buy_qty = ceil((row["Needed"] - row["Qty"]))
         elif (row["Needed"] >= row["Qty"] or row["Qty"] <= 11):
             buy_qty = ceil((row["Needed"] - row["Qty"]) / row["Qty per Package"])
         if buy_qty != 0:
