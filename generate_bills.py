@@ -10,7 +10,9 @@ def generate_bills(df, extra_flavor):
     For this it requires a DataFrame with the orders.
     """
 
-    total_boxes = 0
+    box_prices = {'2x': 0.27, '5x': 0.36}
+    boxes = {'2x': 0, '5x': 0}
+    spacers = 0
     total = 0
     cost = 0
     numCupcakes = 0
@@ -31,9 +33,15 @@ def generate_bills(df, extra_flavor):
             price*=0.95
         elif (sum == 5):
             price = 12.00
-        boxes = ceil(sum/5)
-        total_boxes += boxes
-        cost += boxes*box_cost
+        if sum <= 2:
+            boxes['2x'] += 1
+            cost += box_prices['2x']
+            spacers += sum % 2
+        else:
+            boxes_num = ceil(sum/5)
+            boxes['5x'] += boxes_num
+            cost += boxes_num*box_prices['5x']
+            spacers += sum % 5
         total += price
         numCupcakes += sum
 
@@ -64,5 +72,6 @@ def generate_bills(df, extra_flavor):
         'Profit': round(profit, 2),
         'CupcakesSold': numCupcakes,
         'ProfitPerCupcake': round(profit/numCupcakes, 2),
-        'Boxes': total_boxes
+        'Boxes': boxes,
+        'Spacers': spacers
     }

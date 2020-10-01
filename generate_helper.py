@@ -70,11 +70,9 @@ def generate_helper(orders_df, stock_df, metrics, extra_flavor):
     helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
 
     #Informações sobre as caixas
-    helper.write("Caixas em estoque: {}\n".format(stock_df.at["caixas", "Qty"]))
-    if stock_df.at["caixas", "Qty"] < metrics["Boxes"]:
-        helper.write("Necessária a produção de {} caixas\n".format(metrics["Boxes"] - stock_df.at["caixas", "Qty"]))
-    else:
-        helper.write("Caixas suficientes no estoque.\n")
+    helper.write("Caixas usadas (2x): {}\n".format(metrics['Boxes']['2x']))
+    helper.write("Caixas usadas (5x): {}\n".format(metrics['Boxes']['5x']))
+    helper.write("Espaçadores necessários: {}\n".format(metrics['Spacers']))
     helper.write("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n")
 
     #Informações adicionais sobre as fornadas necessárias
