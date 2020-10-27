@@ -46,7 +46,7 @@ def generate_bills(df, extra_flavor):
         numCupcakes += sum
 
         order_confirmations.write("\n" + row["Cliente"] + "\n")
-        order_confirmations.write("Oie, o dia das entregas está chegando!\n\n")
+        order_confirmations.write("Oie, a hora das entregas está chegando!\n\n")
         order_confirmations.write("Vamos conferir seu pedido:\n")
         for flavor in flavors:
             cost += row[flavor] * info.at[flavor, "perCupcake"]
@@ -58,7 +58,7 @@ def generate_bills(df, extra_flavor):
             order_confirmations.write("\nTotal com desconto aplicado: R${:.2f}\n".format(round(price,2)))
         else:
             order_confirmations.write("\nTotal: R${:.2f}\n".format(round(price, 2)))
-        order_confirmations.write("(apenas em dinheiro ou transferência)\n\nVocê vai estar em casa a partir das 18h00 amanhã para nós entregarmos?\n")
+        order_confirmations.write("(apenas em dinheiro ou transferência)\n\nVocê vai estar em casa a partir das 16h30 hoje para nós entregarmos?\n")
         if row["PedirEndereço"] == "S":
             order_confirmations.write("Além disso, em que endereço você deseja que entreguemos?\n")
 

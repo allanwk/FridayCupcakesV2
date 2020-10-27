@@ -1,5 +1,6 @@
 import pickle
 import os.path
+import os
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -8,6 +9,12 @@ import pandas as pd
 import datetime
 from math import ceil
 import warnings
+from dotenv import load_dotenv
+
+#Carregando variáveis de ambiente
+load_dotenv()
+ORDERS_SHEET_ID = os.environ.get("ORDERS_SHEET_ID")
+PARENT_FOLDER_ID = os.environ.get("PARENT_FOLDER_ID")
 
 #Módulos particulares
 from generate_bills import generate_bills
@@ -19,7 +26,6 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 # Definição de escopos necessários do Google Cloud
 # Se forem modificados deletar o arquivo PICKLE
 SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets']
-ORDERS_SHEET_ID = '1tDdoexzEMvBmHiFFPs9nl_UO92kfa7amWEgoyeeLWCI'
 
 def create_drive_file(name, path, parent_id, drive_service):
     metadata = {'name': name, 'parents': [parent_id]}
@@ -106,7 +112,7 @@ def main():
                                             fields='files(id)').execute()
         if len(response['files']) == 0:
             print("Criando o arquivo {} no drive.".format(path))
-            response = create_drive_file(path, "./" + path, '12CI1in324iy_Q8sA51nMRp4mTGmgQwtK', drive_service)
+            response = create_drive_file(path, "./" + path, PARENT_FOLDER_ID, drive_service)
             needed_files[path] = response['id']
         else:
             needed_files[path] = response['files'][0]['id']
